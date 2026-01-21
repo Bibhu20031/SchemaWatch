@@ -3,15 +3,17 @@ package main
 import (
 	"log"
 
-	"github.com/Bibhu20031/SchemaWatch/internal/config"
+	database "github.com/Bibhu20031/SchemaWatch/internal/storage"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	cfg := config.Load()
+	_ = godotenv.Load()
 
-	log.Printf("starting schemawatch | env=%s | port=%s",
-		cfg.AppEnv,
-		cfg.AppPort,
-	)
+	_, err := database.ConnectDB()
+	if err != nil {
+		log.Fatal("failed to connect database")
+	}
 
+	log.Println("service started")
 }
