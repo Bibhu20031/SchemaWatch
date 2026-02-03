@@ -31,3 +31,17 @@ func (h *Handler) Register(c *gin.Context) {
 		"schema_id": id,
 	})
 }
+
+func (h *Handler) List(c *gin.Context) {
+	schemas, err := h.service.List(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to fetch schemas",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"schemas": schemas,
+	})
+}

@@ -39,6 +39,7 @@ func main() {
 	schemaHandler := schema.NewHandler(schemaService)
 
 	api.POST("/schemas", schemaHandler.Register)
+	api.GET("/schemas", schemaHandler.List)
 
 	log.Println("service started on :8080")
 	if err := r.Run(":8080"); err != nil {

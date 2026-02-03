@@ -51,3 +51,48 @@ func (r *Repository) CreateSchema(
 
 	return schemaID, tx.Commit(ctx)
 }
+
+func (r *Repository) ListSchemas(ctx context.Context) ([]map[string]any, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, db_host, db_port, db_name, schema_name, table_name, created_at
+		FROM schemas
+		ORDER BY created_at DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []map[string]any
+
+	for rows.Next() {
+		var (
+			id         int64
+			dbHost     string
+			dbPort     int
+			dbName     string
+			schemaName string
+			tableName  string
+			createdAt  any
+		)
+
+		if err := rows.Scan(
+			&id, &dbHost, &dbPort, &dbName,
+			&schemaName, &tableName, &createdAt,
+		); err != nil {
+			return nil, err
+		}
+
+		result = append(result, map[string]any{
+			"id":          id,
+			"db_host":     dbHost,
+			"db_port":     dbPort,
+			"db_name":     dbName,
+			"schema_name": schemaName,
+			"table_name":  tableName,
+			"created_at":  createdAt,
+		})
+	}
+
+	return result, nil
+}

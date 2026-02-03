@@ -29,3 +29,7 @@ func (s *Service) Register(ctx context.Context, req RegisterRequest) (int64, err
 
 	return s.repo.CreateSchema(ctx, req, snap)
 }
+
+func (s *Service) List(ctx context.Context) ([]map[string]any, error) {
+	return s.repo.ListSchemas(ctx)
+}
