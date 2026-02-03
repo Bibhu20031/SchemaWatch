@@ -3,6 +3,8 @@ package schema
 import (
 	"net/http"
 
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,5 +45,33 @@ func (h *Handler) List(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"schemas": schemas,
+	})
+}
+
+func (h *Handler) GetLatest(c *gin.Context) {
+	idParam := c.Param("schema_id")
+
+	schemaID, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid schema id",
+		})
+		return
+	}
+
+	version, snapshot, err := h.service.GetLatest(
+		c.Request.Context(),
+		schemaID,
+	)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "schema not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"version":  version,
+		"snapshot": snapshot,
 	})
 }

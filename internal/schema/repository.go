@@ -96,3 +96,22 @@ func (r *Repository) ListSchemas(ctx context.Context) ([]map[string]any, error) 
 
 	return result, nil
 }
+
+func (r *Repository) GetLatestVersion(
+	ctx context.Context,
+	schemaID int64,
+) (int, []byte, error) {
+
+	var version int
+	var snapshot []byte
+
+	err := r.db.QueryRow(ctx, `
+		SELECT version, snapshot
+		FROM schema_versions
+		WHERE schema_id = $1
+		ORDER BY version DESC
+		LIMIT 1
+	`, schemaID).Scan(&version, &snapshot)
+
+	return version, snapshot, err
+}

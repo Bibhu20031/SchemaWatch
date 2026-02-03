@@ -40,6 +40,7 @@ func main() {
 
 	api.POST("/schemas", schemaHandler.Register)
 	api.GET("/schemas", schemaHandler.List)
+	api.GET("/schemas/:schema_id/latest", schemaHandler.GetLatest)
 
 	log.Println("service started on :8080")
 	if err := r.Run(":8080"); err != nil {
