@@ -16,3 +16,16 @@ type DriftChange struct {
 	BeforeValue any        `json:"before,omitempty"`
 	AfterValue  any        `json:"after,omitempty"`
 }
+
+type ImpactLevel string
+
+const (
+	ImpactSafe     ImpactLevel = "SAFE"
+	ImpactRisky    ImpactLevel = "RISKY"
+	ImpactBreaking ImpactLevel = "BREAKING"
+)
+
+type ClassifiedChange struct {
+	DriftChange
+	Impact ImpactLevel `json:"impact"`
+}
