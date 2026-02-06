@@ -67,3 +67,10 @@ func (s *Service) Process(
 
 	return classified, nil
 }
+
+func (s *Service) ListBySchema(
+	ctx context.Context,
+	schemaID int64,
+) ([]map[string]any, error) {
+	return s.repo.ListBySchema(ctx, schemaID)
+}

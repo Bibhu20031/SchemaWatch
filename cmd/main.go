@@ -46,11 +46,13 @@ func main() {
 
 	driftRepo := drift.NewRepository(pool)
 	driftService := drift.NewService(driftRepo, schemaRepo)
+	driftHandler := drift.NewHandler(driftService)
 
 	api.POST("/schemas", schemaHandler.Register)
 	api.GET("/schemas", schemaHandler.List)
 	api.GET("/schemas/:schema_id/latest", schemaHandler.GetLatest)
 	api.GET("/schemas/:schema_id/versions", schemaHandler.ListVersions)
+	api.GET("/schemas/:schema_id/drifts", driftHandler.List)
 
 	startScheduler(pool, schemaRepo, driftService)
 
