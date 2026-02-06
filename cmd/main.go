@@ -45,7 +45,7 @@ func main() {
 	schemaHandler := schema.NewHandler(schemaService)
 
 	driftRepo := drift.NewRepository(pool)
-	driftService := drift.NewService(driftRepo)
+	driftService := drift.NewService(driftRepo, schemaRepo)
 
 	api.POST("/schemas", schemaHandler.Register)
 	api.GET("/schemas", schemaHandler.List)

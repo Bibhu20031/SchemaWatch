@@ -3,15 +3,21 @@ package drift
 import (
 	"context"
 
+	"github.com/Bibhu20031/SchemaWatch/internal/notify"
+	"github.com/Bibhu20031/SchemaWatch/internal/schema"
 	"github.com/Bibhu20031/SchemaWatch/internal/snapshot"
 )
 
 type Service struct {
-	repo *Repository
+	repo       *Repository
+	schemaRepo *schema.Repository
 }
 
-func NewService(repo *Repository) *Service {
-	return &Service{repo: repo}
+func NewService(
+	repo *Repository,
+	schemaRepo *schema.Repository,
+) *Service {
+	return &Service{repo: repo, schemaRepo: schemaRepo}
 }
 
 func (s *Service) Process(
@@ -30,15 +36,33 @@ func (s *Service) Process(
 		return classified, nil
 	}
 
-	err := s.repo.StoreEvents(
+	if err := s.repo.StoreEvents(
 		ctx,
 		schemaID,
 		fromVersion,
 		toVersion,
 		classified,
-	)
-	if err != nil {
+	); err != nil {
 		return nil, err
+	}
+
+	for _, c := range classified {
+		if c.Impact != ImpactBreaking {
+			continue
+		}
+
+		url, err := s.schemaRepo.GetWebhookURL(ctx, schemaID)
+		if err != nil || url == "" {
+			continue
+		}
+
+		_ = notify.Send(url, notify.Payload{
+			SchemaID:    schemaID,
+			Impact:      string(c.Impact),
+			Summary:     string(c.Type) + " on " + c.ColumnName,
+			VersionFrom: fromVersion,
+			VersionTo:   toVersion,
+		})
 	}
 
 	return classified, nil

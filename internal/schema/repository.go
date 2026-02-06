@@ -182,3 +182,19 @@ func (r *Repository) GetLastTwoVersions(
 
 	return v1, s1, v2, s2, nil
 }
+
+func (r *Repository) GetWebhookURL(
+	ctx context.Context,
+	schemaID int64,
+) (string, error) {
+
+	var url string
+	err := r.db.QueryRow(ctx, `
+		SELECT url
+		FROM webhooks
+		WHERE schema_id = $1
+		LIMIT 1
+	`, schemaID).Scan(&url)
+
+	return url, err
+}
