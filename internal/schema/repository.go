@@ -97,6 +97,41 @@ func (r *Repository) ListSchemas(ctx context.Context) ([]map[string]any, error) 
 	return result, nil
 }
 
+func (r *Repository) ListVersions(
+	ctx context.Context,
+	schemaID int64,
+) ([]map[string]any, error) {
+
+	rows, err := r.db.Query(ctx, `
+		SELECT version, created_at
+		FROM schema_versions
+		WHERE schema_id = $1
+		ORDER BY version ASC
+	`, schemaID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var versions []map[string]any
+
+	for rows.Next() {
+		var version int
+		var createdAt any
+
+		if err := rows.Scan(&version, &createdAt); err != nil {
+			return nil, err
+		}
+
+		versions = append(versions, map[string]any{
+			"version":    version,
+			"created_at": createdAt,
+		})
+	}
+
+	return versions, nil
+}
+
 func (r *Repository) GetLatestVersion(
 	ctx context.Context,
 	schemaID int64,
@@ -114,4 +149,36 @@ func (r *Repository) GetLatestVersion(
 	`, schemaID).Scan(&version, &snapshot)
 
 	return version, snapshot, err
+}
+
+func (r *Repository) GetLastTwoVersions(
+	ctx context.Context,
+	schemaID int64,
+) (int, []byte, int, []byte, error) {
+
+	rows, err := r.db.Query(ctx, `
+		SELECT version, snapshot
+		FROM schema_versions
+		WHERE schema_id = $1
+		ORDER BY version DESC
+		LIMIT 2
+	`, schemaID)
+	if err != nil {
+		return 0, nil, 0, nil, err
+	}
+	defer rows.Close()
+
+	var (
+		v1, v2 int
+		s1, s2 []byte
+	)
+
+	if rows.Next() {
+		rows.Scan(&v2, &s2)
+	}
+	if rows.Next() {
+		rows.Scan(&v1, &s1)
+	}
+
+	return v1, s1, v2, s2, nil
 }

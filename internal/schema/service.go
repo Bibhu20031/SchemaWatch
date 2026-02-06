@@ -53,3 +53,10 @@ func (s *Service) GetLatest(
 
 	return version, snapshot, nil
 }
+
+func (s *Service) ListVersions(
+	ctx context.Context,
+	schemaID int64,
+) ([]map[string]any, error) {
+	return s.repo.ListVersions(ctx, schemaID)
+}

@@ -75,3 +75,21 @@ func (h *Handler) GetLatest(c *gin.Context) {
 		"snapshot": snapshot,
 	})
 }
+
+func (h *Handler) ListVersions(c *gin.Context) {
+	idParam := c.Param("schema_id")
+
+	schemaID, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid schema id"})
+		return
+	}
+
+	versions, err := h.service.ListVersions(c.Request.Context(), schemaID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to fetch versions"})
+		return
+	}
+
+	c.JSON(200, gin.H{"versions": versions})
+}
