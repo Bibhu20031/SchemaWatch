@@ -92,9 +92,9 @@ This command generates a raw API key and its hashed value. The hashed value shou
 
 Run:
 
-'''
+```
 go run ./cmd/key
-'''
+```
 
 Copy the generated hashed key and insert it into the api_keys table.
 
@@ -102,9 +102,9 @@ Running with Go
 
 To run the application directly using Go, set the DATABASE_URL environment variable and start the server.
 
-'''
+```
 go run ./cmd
-'''
+```
 
 The service will start on port 8080.
 
@@ -118,15 +118,15 @@ DATABASE_URL must be provided and should point to a PostgreSQL database.
 
 Example environment file:
 
-'''
+```
 DATABASE_URL=postgres://user:password@host:5432/dbname?sslmode=require
-'''
+```
 
 To start the service using Docker:
 
-'''
+```
 docker-compose up --build
-'''
+```
 
 Database Migrations
 
